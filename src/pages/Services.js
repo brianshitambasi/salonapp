@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { serviceAPI } from '../services/api';
 import { Container, Row, Col, Card, Spinner, Badge, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaClock, FaStar } from 'react-icons/fa';
+import { FaClock, FaStar, FaCut, FaPaintBrush, FaSpa, FaHandSparkles, FaWind, FaMagic } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 
 const Services = () => {
@@ -17,18 +17,49 @@ const Services = () => {
   const loadServices = async () => {
     try {
       const res = await serviceAPI.getAll();
-      console.log('Services loaded:', res.data);
-      setServices(res.data);
+      if (res.data && res.data.length > 0) {
+        setServices(res.data);
+      } else {
+        // Default services if none in database
+        setServices(getDefaultServices());
+      }
     } catch (err) {
       console.error('Error loading services:', err);
-      toast.error('Failed to load services');
+      setServices(getDefaultServices());
     } finally {
       setLoading(false);
     }
   };
 
+  const getDefaultServices = () => {
+    return [
+      { _id: '1', name: 'Locs', description: 'Professional locs styling and maintenance', price: 2500, durationMinutes: 120, imageUrl: '', category: 'hair', popular: true },
+      { _id: '2', name: 'Dreadlocs', description: 'Expert dreadlock installation and care', price: 3000, durationMinutes: 150, imageUrl: '', category: 'hair', popular: true },
+      { _id: '3', name: 'Wig Styling', description: 'Custom wig fitting and styling', price: 2000, durationMinutes: 60, imageUrl: '', category: 'hair', popular: false },
+      { _id: '4', name: 'Braiding', description: 'Beautiful braids for any occasion', price: 1800, durationMinutes: 120, imageUrl: '', category: 'hair', popular: true },
+      { _id: '5', name: 'Ghanians', description: 'Trendy Ghanaian weaving styles', price: 2200, durationMinutes: 90, imageUrl: '', category: 'hair', popular: false },
+      { _id: '6', name: 'Hair Colouring', description: 'Professional hair coloring and highlights', price: 3500, durationMinutes: 90, imageUrl: '', category: 'hair', popular: false },
+      { _id: '7', name: 'Hair Treatment', description: 'Deep conditioning and hair repair', price: 1500, durationMinutes: 60, imageUrl: '', category: 'hair', popular: false },
+      { _id: '8', name: 'Knotless', description: 'Pain-free knotless braiding technique', price: 2800, durationMinutes: 180, imageUrl: '', category: 'hair', popular: true },
+      { _id: '9', name: 'Twists', description: 'Stylish twists for natural hair', price: 2000, durationMinutes: 120, imageUrl: '', category: 'hair', popular: false },
+      { _id: '10', name: 'Nail Services', description: 'Manicure, pedicure, and nail art', price: 1500, durationMinutes: 60, imageUrl: '', category: 'nails', popular: false },
+      { _id: '11', name: 'Makeup', description: 'Professional makeup application', price: 2500, durationMinutes: 60, imageUrl: '', category: 'makeup', popular: false },
+      { _id: '12', name: 'Facial', description: 'Rejuvenating facial treatments', price: 3000, durationMinutes: 60, imageUrl: '', category: 'spa', popular: false },
+      { _id: '13', name: 'Weaving', description: 'Expert hair weaving services', price: 3500, durationMinutes: 120, imageUrl: '', category: 'hair', popular: false }
+    ];
+  };
+
+  const getIcon = (serviceName) => {
+    const icons = {
+      'Locs': <FaCut />, 'Dreadlocs': <FaCut />, 'Wig Styling': <FaMagic />, 'Braiding': <FaWind />,
+      'Ghanians': <FaCut />, 'Hair Colouring': <FaPaintBrush />, 'Hair Treatment': <FaSpa />,
+      'Knotless': <FaWind />, 'Twists': <FaWind />, 'Nail Services': <FaHandSparkles />,
+      'Makeup': <FaMagic />, 'Facial': <FaSpa />, 'Weaving': <FaCut />
+    };
+    return icons[serviceName] || <FaCut />;
+  };
+
   const handleBookNow = (service) => {
-    // Store selected service in sessionStorage to pre-select in booking flow
     sessionStorage.setItem('selectedService', JSON.stringify(service));
     navigate('/book-now');
   };
@@ -37,78 +68,58 @@ const Services = () => {
 
   return (
     <Container className="py-4">
-      <h1 className="mb-4 text-center">Our Services</h1>
-      <p className="text-center text-muted mb-5">Browse our premium services and book your appointment</p>
-      
-      <Row>
-        {services.map(service => (
-          <Col md={4} key={service._id} className="mb-4">
-            <Card className="h-100 shadow-sm">
-              {service.imageUrl && (
-                <Card.Img 
-                  variant="top" 
-                  src={service.imageUrl} 
-                  style={{ height: '200px', objectFit: 'cover' }} 
-                />
-              )}
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-start">
-                  <Card.Title className="mb-0">{service.name}</Card.Title>
-                  {service.popular && (
-                    <Badge bg="warning" text="dark" className="d-flex align-items-center">
-                      <FaStar className="me-1" size={12} /> Popular
-                    </Badge>
-                  )}
-                </div>
-                <Card.Text className="mt-2 text-muted">{service.description}</Card.Text>
-                
-                {service.benefits && service.benefits.length > 0 && (
-                  <div className="mb-2">
-                    <small className="text-success">
-                      ‚úì {service.benefits.slice(0, 2).join(' ‚Ä¢ ')}
-                      {service.benefits.length > 2 && ` +${service.benefits.length - 2} more`}
-                    </small>
-                  </div>
-                )}
-                
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <div>
-                    <h4 className="text-primary mb-0">
-                      KSH {service.discount > 0 ? service.price - (service.price * service.discount / 100) : service.price}
-                    </h4>
-                    {service.discount > 0 && (
-                      <small className="text-muted text-decoration-line-through">KSH {service.price}</small>
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold mb-3">Our Services</h1>
+        <p className="lead text-muted">Discover our wide range of professional beauty services</p>
+      </div>
+
+      {/* Category Sections */}
+      {['hair', 'nails', 'makeup', 'spa'].map(category => {
+        const categoryServices = services.filter(s => s.category === category);
+        if (categoryServices.length === 0) return null;
+        const categoryTitles = {
+          hair: 'Ì≤á‚Äç‚ôÄÔ∏è Hair Services',
+          nails: 'Ì≤Ö Nail Services',
+          makeup: 'Ì≤Ñ Makeup Services',
+          spa: 'Ì∑ñ‚Äç‚ôÄÔ∏è Spa & Facial'
+        };
+        return (
+          <div key={category} className="mb-5">
+            <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block' }}>{categoryTitles[category]}</h2>
+            <Row>
+              {categoryServices.map(service => (
+                <Col md={4} key={service._id} className="mb-4">
+                  <Card className="h-100 shadow-sm border-0" style={{ transition: 'transform 0.3s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                    {service.imageUrl ? (
+                      <Card.Img variant="top" src={service.imageUrl} style={{ height: '200px', objectFit: 'cover' }} />
+                    ) : (
+                      <div className="bg-light d-flex align-items-center justify-content-center" style={{ height: '200px' }}>
+                        {getIcon(service.name)} <span className="ms-2">{service.name}</span>
+                      </div>
                     )}
-                  </div>
-                  <div className="text-muted">
-                    <FaClock className="me-1" /> {service.durationMinutes} min
-                  </div>
-                </div>
-              </Card.Body>
-              <Card.Footer className="bg-white border-0 pb-3">
-                <Button 
-                  variant="primary" 
-                  className="w-100 py-2"
-                  onClick={() => handleBookNow(service)}
-                >
-                  Proceed to Book
-                </Button>
-              </Card.Footer>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-      
-      {services.length === 0 && (
-        <div className="text-center py-5">
-          <p>No services available yet. Admin needs to add services.</p>
-          {localStorage.getItem('token') && (
-            <Button variant="primary" onClick={() => navigate('/admin')}>
-              Go to Admin Dashboard
-            </Button>
-          )}
-        </div>
-      )}
+                    <Card.Body>
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <Card.Title className="mb-0">{service.name}</Card.Title>
+                        {service.popular && <Badge bg="warning" text="dark" style={{ backgroundColor: '#DAA520', color: '#fff' }}>Popular</Badge>}
+                      </div>
+                      <Card.Text className="text-muted">{service.description}</Card.Text>
+                      <div className="d-flex justify-content-between align-items-center mt-3">
+                        <h4 className="mb-0" style={{ color: '#DAA520' }}>KSH {service.price}</h4>
+                        <div className="text-muted"><FaClock className="me-1" /> {service.durationMinutes} min</div>
+                      </div>
+                    </Card.Body>
+                    <Card.Footer className="bg-white border-0 pb-3">
+                      <Button variant="primary" className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
+                        Book Now
+                      </Button>
+                    </Card.Footer>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </div>
+        );
+      })}
     </Container>
   );
 };
