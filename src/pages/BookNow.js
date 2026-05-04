@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { serviceAPI, staffAPI, bookingAPI } from '../services/api';
 import { Container, Row, Col, Card, Button, Alert, Spinner, Form } from 'react-bootstrap';
@@ -15,6 +15,8 @@ const BookNow = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [availableSlots, setAvailableSlots] = useState([]);
   const [selectedSlot, setSelectedSlot] = useState('');
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [error, setError] = useState('');
   const [customerInfo, setCustomerInfo] = useState({
     customerName: '',
     customerEmail: '',
@@ -22,8 +24,6 @@ const BookNow = () => {
     customerLocation: '',
     notes: ''
   });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   // Load services on mount
   useEffect(() => {
@@ -39,9 +39,14 @@ const BookNow = () => {
     }
   };
 
-  // Load staff based on selected service
-  const loadStaff = useCallback(async () => {
-    if (!selectedService) return;
+  // Load staff when service is selected
+  useEffect(() => {
+    if (selectedService) {
+      loadStaff();
+    }
+  }, [selectedService]);
+
+  const loadStaff = async () => {
     try {
       const res = await staffAPI.getAll();
       const relevant = res.data.filter(s => s.serviceIds?.includes(selectedService._id));
@@ -52,16 +57,17 @@ const BookNow = () => {
     } catch (err) {
       toast.error('Failed to load staff');
     }
-  }, [selectedService]);
+  };
 
+  // Load available slots when staff, date, and service are selected
   useEffect(() => {
-    loadStaff();
-  }, [loadStaff]);
+    if (selectedStaff && selectedDate && selectedService) {
+      loadAvailableSlots();
+    }
+  }, [selectedStaff, selectedDate, selectedService]);
 
-  // Load available time slots
-  const loadAvailableSlots = useCallback(async () => {
-    if (!selectedStaff || !selectedDate || !selectedService) return;
-    setLoading(true);
+  const loadAvailableSlots = async () => {
+    setLoadingSlots(true);
     setError('');
     try {
       const res = await bookingAPI.getAvailableSlots({
@@ -76,12 +82,8 @@ const BookNow = () => {
     } catch (err) {
       setError('Failed to load available slots');
     }
-    setLoading(false);
-  }, [selectedStaff, selectedDate, selectedService]);
-
-  useEffect(() => {
-    loadAvailableSlots();
-  }, [loadAvailableSlots]);
+    setLoadingSlots(false);
+  };
 
   const handleServiceSelect = (service) => {
     setSelectedService(service);
@@ -108,7 +110,6 @@ const BookNow = () => {
   };
 
   const handleConfirmBooking = async () => {
-    // Validate customer information
     if (!customerInfo.customerName) {
       toast.error('Please enter your full name');
       return;
@@ -126,14 +127,13 @@ const BookNow = () => {
       return;
     }
     
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(customerInfo.customerEmail)) {
       toast.error('Please enter a valid email address');
       return;
     }
     
-    setLoading(true);
+    setLoadingSlots(true);
     try {
       await bookingAPI.create({
         customerName: customerInfo.customerName,
@@ -148,13 +148,13 @@ const BookNow = () => {
       toast.success('Booking confirmed! We will contact you shortly.');
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Booking failed. Please try again.');
+      setError(err.response?.data?.message || 'Booking failed');
       toast.error('Booking failed');
     }
-    setLoading(false);
+    setLoadingSlots(false);
   };
 
-  // Step 1: Select Service
+  // STEP 1: Select Service
   if (step === 1) {
     return (
       <Container className="py-4">
@@ -176,11 +176,16 @@ const BookNow = () => {
             </Col>
           ))}
         </Row>
+        {services.length === 0 && (
+          <div className="text-center py-5">
+            <p>No services available yet.</p>
+          </div>
+        )}
       </Container>
     );
   }
 
-  // Step 2: Choose Stylist
+  // STEP 2: Choose Stylist
   if (step === 2) {
     return (
       <Container className="py-4">
@@ -202,11 +207,17 @@ const BookNow = () => {
             </Col>
           ))}
         </Row>
+        {staff.length === 0 && (
+          <div className="text-center py-5">
+            <p>No stylists available for {selectedService?.name}.</p>
+            <Button variant="primary" onClick={() => setStep(1)}>Choose Different Service</Button>
+          </div>
+        )}
       </Container>
     );
   }
 
-  // Step 3: Pick Date & Time
+  // STEP 3: Pick Date & Time
   if (step === 3) {
     return (
       <Container className="py-4">
@@ -214,6 +225,7 @@ const BookNow = () => {
           <Button variant="link" onClick={() => setStep(2)} className="mb-3">&larr; Back to Stylists</Button>
         </div>
         <h2 className="mb-4 text-center">Step 3: Pick Date & Time</h2>
+        
         <Row className="justify-content-center">
           <Col md={6}>
             <Form.Group className="mb-4">
@@ -228,14 +240,14 @@ const BookNow = () => {
           </Col>
         </Row>
         
-        {loading && (
+        {loadingSlots && (
           <div className="text-center py-4">
             <Spinner animation="border" />
             <p className="mt-2">Loading available slots...</p>
           </div>
         )}
         
-        {!loading && selectedDate && (
+        {!loadingSlots && selectedDate && (
           <div>
             <h4 className="mb-3 text-center">Available Times:</h4>
             <div className="d-flex flex-wrap justify-content-center gap-2">
@@ -250,6 +262,9 @@ const BookNow = () => {
                 </Button>
               ))}
             </div>
+            {availableSlots.length === 0 && !error && (
+              <p className="text-center text-muted mt-3">No available slots for this date.</p>
+            )}
           </div>
         )}
         
@@ -257,7 +272,7 @@ const BookNow = () => {
         
         {selectedSlot && (
           <div className="text-center mt-4">
-            <Button className="mt-4" variant="success" onClick={() => setStep(4)} size="lg">
+            <Button variant="success" onClick={() => setStep(4)} size="lg">
               Continue to Your Information
             </Button>
           </div>
@@ -266,7 +281,7 @@ const BookNow = () => {
     );
   }
 
-  // Step 4: Customer Information Form
+  // STEP 4: Customer Information
   return (
     <Container className="py-4">
       <div className="mb-3">
@@ -302,7 +317,6 @@ const BookNow = () => {
                     value={customerInfo.customerName}
                     onChange={handleCustomerInfoChange}
                     placeholder="Enter your full name"
-                    required
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -313,9 +327,7 @@ const BookNow = () => {
                     value={customerInfo.customerEmail}
                     onChange={handleCustomerInfoChange}
                     placeholder="your@email.com"
-                    required
                   />
-                  <Form.Text className="text-muted">We'll send confirmation to this email.</Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Phone Number *</Form.Label>
@@ -325,7 +337,6 @@ const BookNow = () => {
                     value={customerInfo.customerPhone}
                     onChange={handleCustomerInfoChange}
                     placeholder="0712345678"
-                    required
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -338,9 +349,7 @@ const BookNow = () => {
                     value={customerInfo.customerLocation}
                     onChange={handleCustomerInfoChange}
                     placeholder="Enter your address or current location"
-                    required
                   />
-                  <Form.Text className="text-muted">Help us know your location for better service.</Form.Text>
                 </Form.Group>
                 <Form.Group className="mb-3">
                   <Form.Label>Special Requests (Optional)</Form.Label>
@@ -358,11 +367,11 @@ const BookNow = () => {
               <Button 
                 variant="success" 
                 onClick={handleConfirmBooking} 
-                disabled={loading}
+                disabled={loadingSlots}
                 className="w-100"
                 size="lg"
               >
-                {loading ? 'Processing...' : 'Confirm Booking'}
+                {loadingSlots ? 'Processing...' : 'Confirm Booking'}
               </Button>
             </Card.Body>
           </Card>
