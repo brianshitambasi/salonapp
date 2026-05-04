@@ -62,7 +62,25 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleFileSelect = (e) => {
+  const uploadFile = async (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${API_URL}/upload/image`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return res.data.imageUrl;
+    } catch (err) {
+      toast.error('Upload failed');
+      return null;
+    }
+  };
+
+  const handleServicePhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -81,7 +99,7 @@ const AdminDashboard = () => {
     reader.readAsDataURL(file);
   };
 
-  const handleStaffFileSelect = (e) => {
+  const handleStaffPhotoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) {
@@ -98,24 +116,6 @@ const AdminDashboard = () => {
       setStaffPreviewUrl(reader.result);
     };
     reader.readAsDataURL(file);
-  };
-
-  const uploadFile = async (file) => {
-    const formData = new FormData();
-    formData.append('image', file);
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post(`${API_URL}/upload/image`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return res.data.imageUrl;
-    } catch (err) {
-      toast.error('Upload failed');
-      return null;
-    }
   };
 
   const addTag = () => {
@@ -264,7 +264,7 @@ const AdminDashboard = () => {
                     <Col md={4}>
                       <Form.Group className="mb-3">
                         <Form.Label>Service Photo</Form.Label>
-                        <Form.Control type="file" accept="image/*" onChange={handleFileSelect} />
+                        <Form.Control type="file" accept="image/*" onChange={handleServicePhotoChange} />
                         {(previewUrl || form.imageUrl) && (
                           <div className="mt-2"><img src={previewUrl || form.imageUrl} alt="Preview" style={{ height: '50px' }} /></div>
                         )}
@@ -272,13 +272,13 @@ const AdminDashboard = () => {
                     </Col>
                   </Row>
                   <Row>
-                    <Col md={6}><Form.Group className="mb-3"><Form.Label>Description</Form.Label><Form.Control as="textarea" rows={2} value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></Form.Group></Col>
-                    <Col md={3}><Form.Group className="mb-3"><Form.Label>Price (KSH)</Form.Label><Form.Control type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required /></Form.Group></Col>
-                    <Col md={3}><Form.Group className="mb-3"><Form.Label>Duration (minutes)</Form.Label><Form.Control type="number" value={form.durationMinutes} onChange={e => setForm({...form, durationMinutes: e.target.value})} required /></Form.Group></Col>
+                    <Col md={6}><Form.Group><Form.Label>Description</Form.Label><Form.Control as="textarea" rows={2} value={form.description} onChange={e => setForm({...form, description: e.target.value})} /></Form.Group></Col>
+                    <Col md={3}><Form.Group><Form.Label>Price (KSH)</Form.Label><Form.Control type="number" value={form.price} onChange={e => setForm({...form, price: e.target.value})} required /></Form.Group></Col>
+                    <Col md={3}><Form.Group><Form.Label>Duration (minutes)</Form.Label><Form.Control type="number" value={form.durationMinutes} onChange={e => setForm({...form, durationMinutes: e.target.value})} required /></Form.Group></Col>
                   </Row>
                   <Row>
-                    <Col md={3}><Form.Group className="mb-3"><Form.Label>Discount (%)</Form.Label><Form.Control type="number" value={form.discount} onChange={e => setForm({...form, discount: e.target.value})} /></Form.Group></Col>
-                    <Col md={3}><Form.Group className="mb-3"><Form.Check type="checkbox" label="Popular" checked={form.popular} onChange={e => setForm({...form, popular: e.target.checked})} /></Form.Group></Col>
+                    <Col md={3}><Form.Group><Form.Label>Discount (%)</Form.Label><Form.Control type="number" value={form.discount} onChange={e => setForm({...form, discount: e.target.value})} /></Form.Group></Col>
+                    <Col md={3}><Form.Group><Form.Check type="checkbox" label="Popular" checked={form.popular} onChange={e => setForm({...form, popular: e.target.checked})} /></Form.Group></Col>
                   </Row>
                   <Row>
                     <Col md={6}><Form.Group><Form.Label>Tags</Form.Label><div className="d-flex"><Form.Control value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addTag())} /><Button type="button" onClick={addTag} className="ms-2">Add</Button></div><div className="mt-2">{form.tags.map(tag => <Badge key={tag} bg="secondary" className="me-1 mb-1" style={{ cursor: 'pointer' }} onClick={() => removeTag(tag)}>{tag} ✕</Badge>)}</div></Form.Group></Col>
@@ -295,9 +295,7 @@ const AdminDashboard = () => {
                 {services.map(s => (
                   <tr key={s._id}>
                     <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', objectFit: 'cover' }} />}</td>
-                    <td>{s.name}</td>
-                    <td>KSH {s.price}</td>
-                    <td>{s.durationMinutes} min</td>
+                    <td>{s.name}</td><td>KSH {s.price}</td><td>{s.durationMinutes} min</td>
                     <td><Button size="sm" variant="warning" className="me-2" onClick={() => { setEditing(s); setForm(s); setPreviewUrl(s.imageUrl); }}>Edit</Button><Button size="sm" variant="danger" onClick={() => deleteService(s._id)}>Delete</Button></td>
                   </tr>
                 ))}
@@ -329,7 +327,7 @@ const AdminDashboard = () => {
                     <Col md={4}>
                       <Form.Group className="mb-3">
                         <Form.Label>Profile Photo</Form.Label>
-                        <Form.Control type="file" accept="image/*" onChange={handleStaffFileSelect} />
+                        <Form.Control type="file" accept="image/*" onChange={handleStaffPhotoChange} />
                         {(staffPreviewUrl || staffForm.imageUrl) && (
                           <div className="mt-2"><img src={staffPreviewUrl || staffForm.imageUrl} alt="Preview" style={{ height: '50px', width: '50px', borderRadius: '50%', objectFit: 'cover' }} /></div>
                         )}
@@ -372,17 +370,13 @@ const AdminDashboard = () => {
             </Card>
             
             <Table striped bordered hover responsive>
-              <thead>
-                <tr><th>Photo</th><th>Name</th><th>Role</th><th>Experience</th><th>Hours</th><th>Bio</th><th>Actions</th></tr>
-              </thead>
+              <thead><tr><th>Photo</th><th>Name</th><th>Role</th><th>Experience</th><th>Hours</th><th>Bio</th><th>Actions</th></tr></thead>
               <tbody>
                 {staff.map(s => (
                   <tr key={s._id}>
                     <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover' }} />}</td>
-                    <td>{s.name}</td>
-                    <td>{s.role}</td>
-                    <td>{s.experience} years</td> <td>{s.workingHours?.start} - {s.workingHours?.end}</td>
-                    <td>{s.bio?.substring(0, 50)}...</td>
+                    <td>{s.name}</td><td>{s.role}</td><td>{s.experience} years</td>
+                    <td>{s.workingHours?.start} - {s.workingHours?.end}</td><td>{s.bio?.substring(0, 50)}...</td>
                     <td><Button size="sm" variant="warning" className="me-2" onClick={() => { setEditing(s); setStaffForm(s); setStaffPreviewUrl(s.imageUrl); }}>Edit</Button><Button size="sm" variant="danger" onClick={() => deleteStaff(s._id)}>Delete</Button></td>
                   </tr>
                 ))}
@@ -402,12 +396,9 @@ const AdminDashboard = () => {
               <tbody>
                 {bookings.map(b => (
                   <tr key={b._id} className={!b.isRead && b.status === 'pending' ? 'table-warning' : ''}>
-                    <td>{b.customerName || b.customerId?.name}</td>
-                    <td>{b.customerEmail}</td>
-                    <td>{b.customerPhone}</td>
-                    <td>{b.notes?.split('|')[0]}</td> <td>{b.serviceId?.name}</td> <td>{b.staffId?.name}</td>
-                    <td>{b.date}</td>
-                    <td>{b.startTime}</td>
+                    <td>{b.customerName || b.customerId?.name}</td><td>{b.customerEmail}</td><td>{b.customerPhone}</td>
+                    <td>{b.notes?.split('|')[0]}</td><td>{b.serviceId?.name}</td><td>{b.staffId?.name}</td>
+                    <td>{b.date}</td><td>{b.startTime}</td>
                     <td><Badge bg={b.status === 'confirmed' ? 'success' : b.status === 'cancelled' ? 'danger' : 'warning'}>{b.status}</Badge></td>
                     <td><div className="d-flex gap-2"><Form.Select size="sm" onChange={e => updateBookingStatus(b._id, e.target.value)} defaultValue={b.status} style={{ width: '100px' }}><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></Form.Select>{!b.isRead && <Button size="sm" variant="outline-success" onClick={() => markAsRead(b._id)}>Mark Read</Button>}</div></td>
                   </tr>
