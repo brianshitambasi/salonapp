@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { serviceAPI, staffAPI, bookingAPI } from '../services/api';
 import { Container, Row, Col, Card, Button, Alert, Spinner, Form } from 'react-bootstrap';
@@ -36,13 +36,8 @@ const BookNow = () => {
     }
   };
 
-  useEffect(() => {
-    if (selectedService) {
-      loadStaff();
-    }
-  }, [selectedService]);
-
-  const loadStaff = async () => {
+  const loadStaff = useCallback(async () => {
+    if (!selectedService) return;
     try {
       const res = await staffAPI.getAll();
       const relevant = res.data.filter(s => s.serviceIds?.includes(selectedService._id));
@@ -50,15 +45,14 @@ const BookNow = () => {
     } catch (err) {
       toast.error('Failed to load staff');
     }
-  };
+  }, [selectedService]);
 
   useEffect(() => {
-    if (selectedStaff && selectedDate && selectedService) {
-      loadAvailableSlots();
-    }
-  }, [selectedStaff, selectedDate, selectedService]);
+    loadStaff();
+  }, [loadStaff]);
 
-  const loadAvailableSlots = async () => {
+  const loadAvailableSlots = useCallback(async () => {
+    if (!selectedStaff || !selectedDate || !selectedService) return;
     setLoading(true);
     setError('');
     try {
@@ -72,7 +66,11 @@ const BookNow = () => {
       setError('Failed to load available slots');
     }
     setLoading(false);
-  };
+  }, [selectedStaff, selectedDate, selectedService]);
+
+  useEffect(() => {
+    loadAvailableSlots();
+  }, [loadAvailableSlots]);
 
   const handleServiceSelect = (service) => {
     setSelectedService(service);
@@ -113,17 +111,7 @@ const BookNow = () => {
         startTime: selectedSlot,
       });
       toast.success('Booking confirmed! We will contact you shortly.');
-      navigate('/booking-success', { 
-        state: { 
-          booking: { 
-            service: selectedService, 
-            staff: selectedStaff, 
-            date: selectedDate, 
-            time: selectedSlot,
-            customer: customerInfo
-          } 
-        } 
-      });
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Booking failed');
       toast.error('Booking failed');
