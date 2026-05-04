@@ -27,63 +27,58 @@ const BookNow = () => {
 
   // Load services on mount
   useEffect(() => {
+    const loadServices = async () => {
+      try {
+        const res = await serviceAPI.getAll();
+        setServices(res.data);
+      } catch (err) {
+        toast.error('Failed to load services');
+      }
+    };
     loadServices();
   }, []);
 
-  const loadServices = async () => {
-    try {
-      const res = await serviceAPI.getAll();
-      setServices(res.data);
-    } catch (err) {
-      toast.error('Failed to load services');
-    }
-  };
-
   // Load staff when service is selected
   useEffect(() => {
-    if (selectedService) {
-      loadStaff();
-    }
-  }, [selectedService]);
-
-  const loadStaff = async () => {
-    try {
-      const res = await staffAPI.getAll();
-      const relevant = res.data.filter(s => s.serviceIds?.includes(selectedService._id));
-      setStaff(relevant);
-      if (relevant.length === 0) {
-        toast.error('No stylists available for this service');
+    const loadStaff = async () => {
+      if (!selectedService) return;
+      try {
+        const res = await staffAPI.getAll();
+        const relevant = res.data.filter(s => s.serviceIds?.includes(selectedService._id));
+        setStaff(relevant);
+        if (relevant.length === 0) {
+          toast.error('No stylists available for this service');
+        }
+      } catch (err) {
+        toast.error('Failed to load staff');
       }
-    } catch (err) {
-      toast.error('Failed to load staff');
-    }
-  };
+    };
+    loadStaff();
+  }, [selectedService]);
 
   // Load available slots when staff, date, and service are selected
   useEffect(() => {
-    if (selectedStaff && selectedDate && selectedService) {
-      loadAvailableSlots();
-    }
-  }, [selectedStaff, selectedDate, selectedService]);
-
-  const loadAvailableSlots = async () => {
-    setLoadingSlots(true);
-    setError('');
-    try {
-      const res = await bookingAPI.getAvailableSlots({
-        staffId: selectedStaff._id,
-        date: selectedDate,
-        serviceId: selectedService._id
-      });
-      setAvailableSlots(res.data.slots);
-      if (res.data.slots.length === 0) {
-        setError('No available slots for this date. Please try another date.');
+    const loadAvailableSlots = async () => {
+      if (!selectedStaff || !selectedDate || !selectedService) return;
+      setLoadingSlots(true);
+      setError('');
+      try {
+        const res = await bookingAPI.getAvailableSlots({
+          staffId: selectedStaff._id,
+          date: selectedDate,
+          serviceId: selectedService._id
+        });
+        setAvailableSlots(res.data.slots);
+        if (res.data.slots.length === 0) {
+          setError('No available slots for this date. Please try another date.');
+        }
+      } catch (err) {
+        setError('Failed to load available slots');
       }
-    } catch (err) {
-      setError('Failed to load available slots');
-    }
-    setLoadingSlots(false);
-  };
+      setLoadingSlots(false);
+    };
+    loadAvailableSlots();
+  }, [selectedStaff, selectedDate, selectedService]);
 
   const handleServiceSelect = (service) => {
     setSelectedService(service);
