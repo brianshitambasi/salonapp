@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { serviceAPI, staffAPI, bookingAPI } from '../services/api';
-import { Button, Table, Form, Card, Alert, Container, Row, Col, Tabs, Tab, Badge, Image } from 'react-bootstrap';
+import { Button, Table, Form, Card, Alert, Container, Row, Col, Tabs, Tab, Badge } from 'react-bootstrap';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -26,7 +26,6 @@ const AdminDashboard = () => {
   const [staffSelectedFile, setStaffSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [staffPreviewUrl, setStaffPreviewUrl] = useState(null);
-  const [uploading, setUploading] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [benefitInput, setBenefitInput] = useState('');
 
@@ -63,7 +62,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Service photo upload
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -83,7 +81,6 @@ const AdminDashboard = () => {
     reader.readAsDataURL(file);
   };
 
-  // Staff photo upload
   const handleStaffFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -298,7 +295,9 @@ const AdminDashboard = () => {
                 {services.map(s => (
                   <tr key={s._id}>
                     <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', objectFit: 'cover' }} />}</td>
-                    <td>{s.name}</td><td>KSH {s.price}</td><td>{s.durationMinutes} min</td>
+                    <td>{s.name}</td>
+                    <td>KSH {s.price}</td>
+                    <td>{s.durationMinutes} min</td>
                     <td><Button size="sm" variant="warning" className="me-2" onClick={() => { setEditing(s); setForm(s); setPreviewUrl(s.imageUrl); }}>Edit</Button><Button size="sm" variant="danger" onClick={() => deleteService(s._id)}>Delete</Button></td>
                   </tr>
                 ))}
@@ -307,7 +306,7 @@ const AdminDashboard = () => {
           </div>
         </Tab>
         
-        {/* STAFF TAB - WITH PHOTO UPLOAD */}
+        {/* STAFF TAB */}
         <Tab eventKey="staff" title="Staff">
           <div className="mt-4">
             <h4>Manage Staff / Stylists</h4>
@@ -380,8 +379,9 @@ const AdminDashboard = () => {
                 {staff.map(s => (
                   <tr key={s._id}>
                     <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover' }} />}</td>
-                    <td>{s.name}</td><td>{s.role}</td><td>{s.experience} years</td>
-                    <td>{s.workingHours?.start} - {s.workingHours?.end}</td>
+                    <td>{s.name}</td>
+                    <td>{s.role}</td>
+                    <td>{s.experience} years</td> <td>{s.workingHours?.start} - {s.workingHours?.end}</td>
                     <td>{s.bio?.substring(0, 50)}...</td>
                     <td><Button size="sm" variant="warning" className="me-2" onClick={() => { setEditing(s); setStaffForm(s); setStaffPreviewUrl(s.imageUrl); }}>Edit</Button><Button size="sm" variant="danger" onClick={() => deleteStaff(s._id)}>Delete</Button></td>
                   </tr>
@@ -403,10 +403,11 @@ const AdminDashboard = () => {
                 {bookings.map(b => (
                   <tr key={b._id} className={!b.isRead && b.status === 'pending' ? 'table-warning' : ''}>
                     <td>{b.customerName || b.customerId?.name}</td>
-                    <td>{b.customerEmail}</td><td>{b.customerPhone}</td>
-                    <td>{b.notes?.split('|')[0]}</td>
-                    <td>{b.serviceId?.name}</td><td>{b.staffId?.name}</td>
-                    <td>{b.date}</td><td>{b.startTime}</td>
+                    <td>{b.customerEmail}</td>
+                    <td>{b.customerPhone}</td>
+                    <td>{b.notes?.split('|')[0]}</td> <td>{b.serviceId?.name}</td> <td>{b.staffId?.name}</td>
+                    <td>{b.date}</td>
+                    <td>{b.startTime}</td>
                     <td><Badge bg={b.status === 'confirmed' ? 'success' : b.status === 'cancelled' ? 'danger' : 'warning'}>{b.status}</Badge></td>
                     <td><div className="d-flex gap-2"><Form.Select size="sm" onChange={e => updateBookingStatus(b._id, e.target.value)} defaultValue={b.status} style={{ width: '100px' }}><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></Form.Select>{!b.isRead && <Button size="sm" variant="outline-success" onClick={() => markAsRead(b._id)}>Mark Read</Button>}</div></td>
                   </tr>
