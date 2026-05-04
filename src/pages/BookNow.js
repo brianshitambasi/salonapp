@@ -25,17 +25,26 @@ const BookNow = () => {
     notes: ''
   });
 
-  // Load services on mount
+  // Load services and check for pre-selected service
   useEffect(() => {
-    const loadServices = async () => {
+    const loadServicesAndCheckPreselected = async () => {
       try {
         const res = await serviceAPI.getAll();
         setServices(res.data);
+        
+        // Check if a service was pre-selected from the Services page
+        const preselectedService = sessionStorage.getItem('selectedService');
+        if (preselectedService) {
+          const service = JSON.parse(preselectedService);
+          setSelectedService(service);
+          setStep(2); // Skip to stylist selection
+          sessionStorage.removeItem('selectedService');
+        }
       } catch (err) {
         toast.error('Failed to load services');
       }
     };
-    loadServices();
+    loadServicesAndCheckPreselected();
   }, []);
 
   // Load staff when service is selected
@@ -163,7 +172,7 @@ const BookNow = () => {
                   <Card.Title>{s.name}</Card.Title>
                   <Card.Text className="text-muted">{s.description || 'Premium service'}</Card.Text>
                   <div className="d-flex justify-content-between align-items-center mt-3">
-                    <h4 className="text-primary mb-0">${s.price}</h4>
+                    <h4 className="text-primary mb-0">KSH {s.price}</h4>
                     <small className="text-muted">{s.durationMinutes} min</small>
                   </div>
                 </Card.Body>
@@ -188,6 +197,7 @@ const BookNow = () => {
           <Button variant="link" onClick={() => setStep(1)} className="mb-3">&larr; Back to Services</Button>
         </div>
         <h2 className="mb-4 text-center">Step 2: Choose a Stylist</h2>
+        <p className="text-center text-muted mb-4">Selected Service: <strong>{selectedService?.name}</strong></p>
         <Row>
           {staff.map(s => (
             <Col md={4} key={s._id} className="mb-3">
@@ -220,6 +230,9 @@ const BookNow = () => {
           <Button variant="link" onClick={() => setStep(2)} className="mb-3">&larr; Back to Stylists</Button>
         </div>
         <h2 className="mb-4 text-center">Step 3: Pick Date & Time</h2>
+        <p className="text-center text-muted mb-4">
+          {selectedService?.name} with <strong>{selectedStaff?.name}</strong>
+        </p>
         
         <Row className="justify-content-center">
           <Col md={6}>
@@ -293,7 +306,7 @@ const BookNow = () => {
               <p><strong>Stylist:</strong> {selectedStaff?.name}</p>
               <p><strong>Date:</strong> {selectedDate}</p>
               <p><strong>Time:</strong> {selectedSlot}</p>
-              <p><strong>Price:</strong> ${selectedService?.price}</p>
+              <p><strong>Price:</strong> KSH {selectedService?.price}</p>
               <p><strong>Duration:</strong> {selectedService?.durationMinutes} minutes</p>
             </Card.Body>
           </Card>

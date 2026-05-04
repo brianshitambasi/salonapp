@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { serviceAPI } from '../services/api';
-import { Container, Row, Col, Card, Spinner, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Badge, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { FaClock, FaStar } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -27,7 +27,9 @@ const Services = () => {
     }
   };
 
-  const handleBookNow = (serviceId) => {
+  const handleBookNow = (service) => {
+    // Store selected service in sessionStorage to pre-select in booking flow
+    sessionStorage.setItem('selectedService', JSON.stringify(service));
     navigate('/book-now');
   };
 
@@ -72,10 +74,10 @@ const Services = () => {
                 <div className="d-flex justify-content-between align-items-center mt-3">
                   <div>
                     <h4 className="text-primary mb-0">
-                      ${service.discount > 0 ? service.price - (service.price * service.discount / 100) : service.price}
+                      KSH {service.discount > 0 ? service.price - (service.price * service.discount / 100) : service.price}
                     </h4>
                     {service.discount > 0 && (
-                      <small className="text-muted text-decoration-line-through">${service.price}</small>
+                      <small className="text-muted text-decoration-line-through">KSH {service.price}</small>
                     )}
                   </div>
                   <div className="text-muted">
@@ -87,9 +89,9 @@ const Services = () => {
                 <Button 
                   variant="primary" 
                   className="w-100 py-2"
-                  onClick={() => handleBookNow(service._id)}
+                  onClick={() => handleBookNow(service)}
                 >
-                  Book Now
+                  Proceed to Book
                 </Button>
               </Card.Footer>
             </Card>
