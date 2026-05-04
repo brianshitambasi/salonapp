@@ -32,12 +32,11 @@ const BookNow = () => {
         const res = await serviceAPI.getAll();
         setServices(res.data);
         
-        // Check if a service was pre-selected from the Services page
         const preselectedService = sessionStorage.getItem('selectedService');
         if (preselectedService) {
           const service = JSON.parse(preselectedService);
           setSelectedService(service);
-          setStep(2); // Skip to stylist selection
+          setStep(2);
           sessionStorage.removeItem('selectedService');
         }
       } catch (err) {
@@ -47,23 +46,18 @@ const BookNow = () => {
     loadServicesAndCheckPreselected();
   }, []);
 
-  // Load staff when service is selected
+  // Load ALL staff (not filtered by service)
   useEffect(() => {
     const loadStaff = async () => {
-      if (!selectedService) return;
       try {
         const res = await staffAPI.getAll();
-        const relevant = res.data.filter(s => s.serviceIds?.includes(selectedService._id));
-        setStaff(relevant);
-        if (relevant.length === 0) {
-          toast.error('No stylists available for this service');
-        }
+        setStaff(res.data);
       } catch (err) {
         toast.error('Failed to load staff');
       }
     };
     loadStaff();
-  }, [selectedService]);
+  }, []);
 
   // Load available slots when staff, date, and service are selected
   useEffect(() => {
@@ -158,11 +152,11 @@ const BookNow = () => {
     setLoadingSlots(false);
   };
 
-  // STEP 1: Select Service
+  // SELECT SERVICE (No Step text)
   if (step === 1) {
     return (
       <Container className="py-4">
-        <h2 className="mb-4 text-center">Step 1: Select a Service</h2>
+        <h2 className="mb-4 text-center">Select a Service</h2>
         <Row>
           {services.map(s => (
             <Col md={4} key={s._id} className="mb-3">
@@ -189,15 +183,15 @@ const BookNow = () => {
     );
   }
 
-  // STEP 2: Choose Stylist
+  // CHOOSE STYLIST (No Step text)
   if (step === 2) {
     return (
       <Container className="py-4">
         <div className="mb-3">
           <Button variant="link" onClick={() => setStep(1)} className="mb-3">&larr; Back to Services</Button>
         </div>
-        <h2 className="mb-4 text-center">Step 2: Choose a Stylist</h2>
-        <p className="text-center text-muted mb-4">Selected Service: <strong>{selectedService?.name}</strong></p>
+        <h2 className="mb-4 text-center">Choose a Stylist</h2>
+        <p className="text-center text-muted mb-4">Selected: <strong>{selectedService?.name}</strong></p>
         <Row>
           {staff.map(s => (
             <Col md={4} key={s._id} className="mb-3">
@@ -214,22 +208,21 @@ const BookNow = () => {
         </Row>
         {staff.length === 0 && (
           <div className="text-center py-5">
-            <p>No stylists available for {selectedService?.name}.</p>
-            <Button variant="primary" onClick={() => setStep(1)}>Choose Different Service</Button>
+            <p>No stylists available. Please contact the salon.</p>
           </div>
         )}
       </Container>
     );
   }
 
-  // STEP 3: Pick Date & Time
+  // PICK DATE & TIME (No Step text)
   if (step === 3) {
     return (
       <Container className="py-4">
         <div className="mb-3">
           <Button variant="link" onClick={() => setStep(2)} className="mb-3">&larr; Back to Stylists</Button>
         </div>
-        <h2 className="mb-4 text-center">Step 3: Pick Date & Time</h2>
+        <h2 className="mb-4 text-center">Pick Date & Time</h2>
         <p className="text-center text-muted mb-4">
           {selectedService?.name} with <strong>{selectedStaff?.name}</strong>
         </p>
@@ -289,13 +282,13 @@ const BookNow = () => {
     );
   }
 
-  // STEP 4: Customer Information
+  // YOUR INFORMATION (No Step text)
   return (
     <Container className="py-4">
       <div className="mb-3">
         <Button variant="link" onClick={() => setStep(3)} className="mb-3">&larr; Back to Date & Time</Button>
       </div>
-      <h2 className="mb-4 text-center">Step 4: Your Information</h2>
+      <h2 className="mb-4 text-center">Your Information</h2>
       <Row className="justify-content-center">
         <Col md={6}>
           <Card className="shadow-sm mb-4">
