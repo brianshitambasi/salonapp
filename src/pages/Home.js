@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Button, Container, Row, Col, Card } from 'react-bootstrap';
-import { FaScissors, FaUserFriends, FaStar, FaClock, FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaCut, FaUserFriends, FaStar, FaClock, FaMapMarkerAlt, FaPhone, FaEnvelope, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 
 const Home = () => {
   return (
@@ -49,7 +49,7 @@ const Home = () => {
           <Col md={3} className="mb-3">
             <Card className="text-center h-100 shadow-sm border-0">
               <Card.Body>
-                <FaScissors size={40} className="text-primary mb-3" />
+                <FaCut size={40} className="text-primary mb-3" />
                 <h5>Expert Stylists</h5>
                 <p className="text-muted small">Professional and experienced team</p>
               </Card.Body>
