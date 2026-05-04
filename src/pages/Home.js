@@ -37,7 +37,7 @@ const Home = () => {
           <Carousel.Item>
             <div style={{ 
               height: '80vh', 
-              backgroundImage: 'url(https://images.unsplash.com/photo-1560066984-1387085d81e4?w=1600&h=600&fit=crop)',
+              backgroundImage: 'url(https://th.bing.com/th/id/OIP.lXeSqVinE_Y4p2OVN9mghQHaD4?w=300&h=180&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               position: 'relative'
@@ -60,7 +60,7 @@ const Home = () => {
           <Carousel.Item>
             <div style={{ 
               height: '80vh', 
-              backgroundImage: 'url(https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=1600&h=600&fit=crop)',
+              backgroundImage: 'url(https://th.bing.com/th/id/OIP.EnDntqELjL3lk86fAgzR5wHaHa?w=182&h=182&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               position: 'relative'
@@ -130,7 +130,7 @@ const Home = () => {
           <Col md={6}>
             <div style={{ overflow: 'hidden', borderRadius: '10px', boxShadow: '0 10px 30px rgba(212,175,55,0.2)' }}>
               <img 
-                src="https://images.unsplash.com/photo-1560066984-1387085d81e4?w=600&h=400&fit=crop" 
+                src="https://th.bing.com/th/id/OIP.5TSsmMbphs1mmgNmOfSBjwHaHa?w=199&h=187&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3" 
                 alt="Salon interior" 
                 className="img-fluid"
                 style={{ transition: 'transform 0.5s ease', cursor: 'pointer' }}
@@ -172,7 +172,7 @@ const Home = () => {
             <div className="service-card" style={{ overflow: 'hidden', borderRadius: '10px', transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-10px) scale(1.02)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0) scale(1)'}>
               <Card className="h-100 border-0">
                 <div style={{ overflow: 'hidden' }}>
-                  <Card.Img variant="top" src="https://images.unsplash.com/photo-1585747860714-2ba829e8b56f?w=400&h=250&fit=crop" style={{ height: '200px', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                  <Card.Img variant="top" src="https://th.bing.com/th/id/OIP.4n5eUb-UoozdLguxu9B7fwHaFj?w=282&h=212&c=7&r=0&o=7&dpr=1.5&pid=1.7&rm=3" style={{ height: '200px', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                 </div>
                 <Card.Body>
                   <Card.Title>Haircut & Styling</Card.Title>
@@ -189,7 +189,7 @@ const Home = () => {
             <div className="service-card" style={{ overflow: 'hidden', borderRadius: '10px', transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)', boxShadow: '0 5px 15px rgba(0,0,0,0.1)' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-10px) scale(1.02)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0) scale(1)'}>
               <Card className="h-100 border-0">
                 <div style={{ overflow: 'hidden' }}>
-                  <Card.Img variant="top" src="https://images.unsplash.com/photo-1632345031435-8724f6897b6a?w=400&h=250&fit=crop" style={{ height: '200px', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
+                  <Card.Img variant="top" src="https://th.bing.com/th/id/OIP.axJUs1TArk-x6Y5jKOh4xQHaFi?w=230&h=150&c=6&r=0&o=7&dpr=1.5&pid=1.7&rm=3" style={{ height: '200px', objectFit: 'cover', transition: 'transform 0.5s ease' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'} />
                 </div>
                 <Card.Body>
                   <Card.Title>Manicure & Pedicure</Card.Title>
