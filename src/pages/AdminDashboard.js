@@ -234,15 +234,22 @@ const AdminDashboard = () => {
 
   return (
     <Container className="py-4">
-      <h2>Admin Dashboard</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 style={{ color: '#DAA520' }}>Admin Dashboard</h2>
+        {unreadCount > 0 && (
+          <Badge bg="warning" style={{ backgroundColor: '#DAA520', fontSize: '1rem', padding: '8px 15px' }}>
+            {unreadCount} New {unreadCount === 1 ? 'Booking' : 'Bookings'}
+          </Badge>
+        )}
+      </div>
       {error && <Alert variant="danger">{error}</Alert>}
       
-      <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4">
+      <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k)} className="mb-4" style={{ borderBottom: '2px solid #DAA520' }}>
         {/* SERVICES TAB */}
         <Tab eventKey="services" title="Services">
           <div className="mt-4">
             <h4>Manage Services</h4>
-            <Card className="mb-4">
+            <Card className="mb-4 shadow-sm">
               <Card.Body>
                 <Form onSubmit={handleServiceSubmit}>
                   <Row>
@@ -256,8 +263,8 @@ const AdminDashboard = () => {
                       <Form.Group className="mb-3">
                         <Form.Label>Category</Form.Label>
                         <Form.Select value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-                          <option value="hair">Hair</option><option value="nails">Nails</option><option value="spa">Spa</option>
-                          <option value="makeup">Makeup</option><option value="waxing">Waxing</option><option value="other">Other</option>
+                          <option value="hair">Ì≤á‚Äç‚ôÄÔ∏è Hair</option><option value="nails">Ì≤Ö Nails</option><option value="spa">Ì∑ñ‚Äç‚ôÄÔ∏è Spa</option>
+                          <option value="makeup">Ì≤Ñ Makeup</option><option value="waxing">Ì∫í Waxing</option><option value="other">‚ú® Other</option>
                         </Form.Select>
                       </Form.Group>
                     </Col>
@@ -266,7 +273,7 @@ const AdminDashboard = () => {
                         <Form.Label>Service Photo</Form.Label>
                         <Form.Control type="file" accept="image/*" onChange={handleServicePhotoChange} />
                         {(previewUrl || form.imageUrl) && (
-                          <div className="mt-2"><img src={previewUrl || form.imageUrl} alt="Preview" style={{ height: '50px' }} /></div>
+                          <div className="mt-2"><img src={previewUrl || form.imageUrl} alt="Preview" style={{ height: '50px', borderRadius: '5px' }} /></div>
                         )}
                       </Form.Group>
                     </Col>
@@ -278,24 +285,28 @@ const AdminDashboard = () => {
                   </Row>
                   <Row>
                     <Col md={3}><Form.Group><Form.Label>Discount (%)</Form.Label><Form.Control type="number" value={form.discount} onChange={e => setForm({...form, discount: e.target.value})} /></Form.Group></Col>
-                    <Col md={3}><Form.Group><Form.Check type="checkbox" label="Popular" checked={form.popular} onChange={e => setForm({...form, popular: e.target.checked})} /></Form.Group></Col>
+                    <Col md={3}><Form.Group><Form.Check type="checkbox" label="‚≠ê Popular" checked={form.popular} onChange={e => setForm({...form, popular: e.target.checked})} /></Form.Group></Col>
                   </Row>
                   <Row>
-                    <Col md={6}><Form.Group><Form.Label>Tags</Form.Label><div className="d-flex"><Form.Control value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addTag())} /><Button type="button" onClick={addTag} className="ms-2">Add</Button></div><div className="mt-2">{form.tags.map(tag => <Badge key={tag} bg="secondary" className="me-1 mb-1" style={{ cursor: 'pointer' }} onClick={() => removeTag(tag)}>{tag} ‚úï</Badge>)}</div></Form.Group></Col>
-                    <Col md={6}><Form.Group><Form.Label>Benefits</Form.Label><div className="d-flex"><Form.Control value={benefitInput} onChange={e => setBenefitInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addBenefit())} /><Button type="button" onClick={addBenefit} className="ms-2">Add</Button></div><div className="mt-2">{form.benefits.map(benefit => <Badge key={benefit} bg="info" className="me-1 mb-1" style={{ cursor: 'pointer' }} onClick={() => removeBenefit(benefit)}>‚úì {benefit} ‚úï</Badge>)}</div></Form.Group></Col>
+                    <Col md={6}><Form.Group><Form.Label>Tags</Form.Label><div className="d-flex"><Form.Control value={tagInput} onChange={e => setTagInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addTag())} /><Button type="button" onClick={addTag} className="ms-2" style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>Add</Button></div><div className="mt-2">{form.tags.map(tag => <Badge key={tag} bg="secondary" className="me-1 mb-1" style={{ cursor: 'pointer' }} onClick={() => removeTag(tag)}>{tag} ‚úï</Badge>)}</div></Form.Group></Col>
+                    <Col md={6}><Form.Group><Form.Label>Benefits</Form.Label><div className="d-flex"><Form.Control value={benefitInput} onChange={e => setBenefitInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addBenefit())} /><Button type="button" onClick={addBenefit} className="ms-2" style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>Add</Button></div><div className="mt-2">{form.benefits.map(benefit => <Badge key={benefit} bg="info" className="me-1 mb-1" style={{ cursor: 'pointer' }} onClick={() => removeBenefit(benefit)}>‚úì {benefit} ‚úï</Badge>)}</div></Form.Group></Col>
                   </Row>
-                  <Button type="submit" disabled={loading}>{loading ? 'Saving...' : (editing ? 'Update' : 'Create')}</Button>
+                  <Button type="submit" disabled={loading} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>{loading ? 'Saving...' : (editing ? 'Update' : 'Create')}</Button>
                   {editing && <Button variant="secondary" className="ms-2" onClick={() => { setEditing(null); setForm({}); setSelectedFile(null); setPreviewUrl(null); }}>Cancel</Button>}
                 </Form>
               </Card.Body>
             </Card>
-            <Table striped bordered hover responsive>
-              <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Duration</th><th>Actions</th></tr></thead>
+            <Table striped bordered hover responsive className="shadow-sm">
+              <thead className="bg-light">
+                <tr><th>Image</th><th>Name</th><th>Price</th><th>Duration</th><th>Actions</th></tr>
+              </thead>
               <tbody>
                 {services.map(s => (
                   <tr key={s._id}>
-                    <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', objectFit: 'cover' }} />}</td>
-                    <td>{s.name}</td><td>KSH {s.price}</td><td>{s.durationMinutes} min</td>
+                    <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', objectFit: 'cover', borderRadius: '5px' }} />}</td>
+                    <td>{s.name}</td>
+                    <td>KSH {s.price}</td>
+                    <td>{s.durationMinutes} min</td>
                     <td><Button size="sm" variant="warning" className="me-2" onClick={() => { setEditing(s); setForm(s); setPreviewUrl(s.imageUrl); }}>Edit</Button><Button size="sm" variant="danger" onClick={() => deleteService(s._id)}>Delete</Button></td>
                   </tr>
                 ))}
@@ -308,7 +319,7 @@ const AdminDashboard = () => {
         <Tab eventKey="staff" title="Staff">
           <div className="mt-4">
             <h4>Manage Staff / Stylists</h4>
-            <Card className="mb-4">
+            <Card className="mb-4 shadow-sm">
               <Card.Body>
                 <Form onSubmit={handleStaffSubmit}>
                   <Row>
@@ -362,21 +373,26 @@ const AdminDashboard = () => {
                       </Form.Group>
                     </Col>
                     <Col md={3} className="d-flex align-items-end">
-                      <Button type="submit" disabled={loading} className="w-100">{loading ? 'Saving...' : (editing ? 'Update Staff' : 'Add Staff')}</Button>
+                      <Button type="submit" disabled={loading} className="w-100" style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>{loading ? 'Saving...' : (editing ? 'Update Staff' : 'Add Staff')}</Button>
                     </Col>
                   </Row>
                 </Form>
               </Card.Body>
             </Card>
             
-            <Table striped bordered hover responsive>
-              <thead><tr><th>Photo</th><th>Name</th><th>Role</th><th>Experience</th><th>Hours</th><th>Bio</th><th>Actions</th></tr></thead>
+            <Table striped bordered hover responsive className="shadow-sm">
+              <thead className="bg-light">
+                <tr><th>Photo</th><th>Name</th><th>Role</th><th>Experience</th><th>Hours</th><th>Bio</th><th>Actions</th></tr>
+              </thead>
               <tbody>
                 {staff.map(s => (
                   <tr key={s._id}>
                     <td>{s.imageUrl && <img src={s.imageUrl} alt={s.name} style={{ height: '40px', width: '40px', borderRadius: '50%', objectFit: 'cover' }} />}</td>
-                    <td>{s.name}</td><td>{s.role}</td><td>{s.experience} years</td>
-                    <td>{s.workingHours?.start} - {s.workingHours?.end}</td><td>{s.bio?.substring(0, 50)}...</td>
+                    <td>{s.name}</td>
+                    <td>{s.role}</td>
+                    <td>{s.experience} years</td>
+                     <td>{s.workingHours?.start} - {s.workingHours?.end}</td>
+                    <td>{s.bio?.substring(0, 50)}...</td>
                     <td><Button size="sm" variant="warning" className="me-2" onClick={() => { setEditing(s); setStaffForm(s); setStaffPreviewUrl(s.imageUrl); }}>Edit</Button><Button size="sm" variant="danger" onClick={() => deleteStaff(s._id)}>Delete</Button></td>
                   </tr>
                 ))}
@@ -389,16 +405,21 @@ const AdminDashboard = () => {
         <Tab eventKey="bookings" title={`Bookings ${unreadCount > 0 ? `(${unreadCount} new)` : ''}`}>
           <div className="mt-4">
             <h4>Manage Bookings</h4>
-            <Table striped bordered hover responsive>
-              <thead>
+            <Table striped bordered hover responsive className="shadow-sm">
+              <thead className="bg-light">
                 <tr><th>Customer</th><th>Email</th><th>Phone</th><th>Location</th><th>Service</th><th>Staff</th><th>Date</th><th>Time</th><th>Status</th><th>Action</th></tr>
               </thead>
               <tbody>
                 {bookings.map(b => (
                   <tr key={b._id} className={!b.isRead && b.status === 'pending' ? 'table-warning' : ''}>
-                    <td>{b.customerName || b.customerId?.name}</td><td>{b.customerEmail}</td><td>{b.customerPhone}</td>
-                    <td>{b.notes?.split('|')[0]}</td><td>{b.serviceId?.name}</td><td>{b.staffId?.name}</td>
-                    <td>{b.date}</td><td>{b.startTime}</td>
+                    <td>{b.customerName || b.customerId?.name}</td>
+                    <td>{b.customerEmail}</td>
+                    <td>{b.customerPhone}</td>
+                    <td>{b.notes?.split('|')[0]}</td>
+                    <td>{b.serviceId?.name}</td>
+                    <td>{b.staffId?.name}</td>
+                    <td>{b.date}</td>
+                    <td>{b.startTime}</td>
                     <td><Badge bg={b.status === 'confirmed' ? 'success' : b.status === 'cancelled' ? 'danger' : 'warning'}>{b.status}</Badge></td>
                     <td><div className="d-flex gap-2"><Form.Select size="sm" onChange={e => updateBookingStatus(b._id, e.target.value)} defaultValue={b.status} style={{ width: '100px' }}><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></Form.Select>{!b.isRead && <Button size="sm" variant="outline-success" onClick={() => markAsRead(b._id)}>Mark Read</Button>}</div></td>
                   </tr>

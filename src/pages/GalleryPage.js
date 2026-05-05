@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { galleryAPI } from '../services/api';
 import { Container, Row, Col, Card, Spinner, Modal, Image, Button, Form } from 'react-bootstrap';
 import { useAuth } from '../context/AuthContext';
-import { FaHeart, FaRegHeart, FaTrash, FaEdit, FaComment, FaPlus, FaPlay, FaStar } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaTrash, FaEdit, FaComment, FaPlus, FaPlay, FaStar, FaUpload } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 
@@ -209,8 +209,8 @@ const GalleryPage = () => {
   return (
     <Container className="py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Our Gallery</h2>
-        {isAdmin && <Button variant="primary" onClick={() => setShowPostModal(true)}><FaPlus className="me-2" /> Add New Post</Button>}
+        <h2 style={{ color: '#DAA520' }}>Ì≥∏ Our Gallery</h2>
+        {isAdmin && <Button onClick={() => setShowPostModal(true)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}><FaPlus className="me-2" /> Add New Post</Button>}
       </div>
       <Row>
         {posts.map(post => {
@@ -220,7 +220,7 @@ const GalleryPage = () => {
           const totalRatings = post.ratings?.length || 0;
           return (
             <Col md={4} key={post._id} className="mb-4">
-              <Card className="h-100 shadow-sm">
+              <Card className="h-100 shadow-sm border-0" style={{ transition: 'transform 0.3s ease', overflow: 'hidden' }} onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-5px)'} onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}>
                 {post.imageUrl && (
                   <div style={{ position: 'relative', cursor: 'pointer', backgroundColor: '#000', minHeight: '250px' }} onClick={() => openMediaModal(post.imageUrl, isVideo ? 'video' : 'image')}>
                     {isVideo ? (
@@ -241,11 +241,11 @@ const GalleryPage = () => {
                   <div className="mb-2">
                     <div className="d-flex align-items-center justify-content-between">
                       <div>
-                        {[1, 2, 3, 4, 5].map(star => <FaStar key={star} color={star <= avgRating ? '#ffc107' : '#e4e5e9'} className="me-1" />)}
+                        {[1, 2, 3, 4, 5].map(star => <FaStar key={star} color={star <= avgRating ? '#DAA520' : '#e4e5e9'} className="me-1" />)}
                         <span className="ms-2 text-muted">({avgRating})</span>
                       </div>
                       {user && !isAdmin && (
-                        <Button size="sm" variant="outline-warning" onClick={() => { setSelectedPost(post); setRatingValue(userRating); setShowRatingModal(true); }}>
+                        <Button size="sm" variant="outline-warning" onClick={() => { setSelectedPost(post); setRatingValue(userRating); setShowRatingModal(true); }} style={{ borderColor: '#DAA520', color: '#DAA520' }}>
                           {userRating > 0 ? `Rate (${userRating}‚òÖ)` : 'Rate This'}
                         </Button>
                       )}
@@ -284,42 +284,58 @@ const GalleryPage = () => {
         })}
       </Row>
       {posts.length === 0 && !loading && <div className="text-center py-5"><p>No gallery posts yet. {isAdmin && 'Click "Add New Post" to upload images or videos.'}</p></div>}
+      
+      {/* Media Modal */}
       <Modal show={selectedMedia} onHide={() => setSelectedMedia(null)} centered size="xl" fullscreen="lg-down">
         <Modal.Body className="p-0 bg-dark" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {selectedMediaType === 'video' ? <video src={selectedMedia} controls autoPlay style={{ maxWidth: '100%', maxHeight: '90vh' }} className="rounded">Your browser does not support the video tag.</video> : <Image src={selectedMedia} fluid style={{ maxHeight: '90vh', objectFit: 'contain' }} />}
         </Modal.Body>
         <Modal.Footer className="bg-dark border-0"><Button variant="secondary" onClick={() => setSelectedMedia(null)}>Close</Button></Modal.Footer>
       </Modal>
+      
+      {/* Rating Modal */}
       <Modal show={showRatingModal} onHide={() => { setShowRatingModal(false); setRatingValue(0); }} centered>
-        <Modal.Header closeButton><Modal.Title>Rate this work</Modal.Title></Modal.Header>
+        <Modal.Header closeButton><Modal.Title style={{ color: '#DAA520' }}>‚≠ê Rate this work</Modal.Title></Modal.Header>
         <Modal.Body className="text-center">
           <h5>{selectedPost?.title}</h5>
           <div className="my-4">
             <div className="d-flex justify-content-center gap-2">
-              {[1, 2, 3, 4, 5].map(star => <FaStar key={star} size={40} className="cursor-pointer" color={(hoverRating || ratingValue) >= star ? '#ffc107' : '#e4e5e9'} onClick={() => setRatingValue(star)} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} style={{ cursor: 'pointer' }} />)}
+              {[1, 2, 3, 4, 5].map(star => <FaStar key={star} size={40} className="cursor-pointer" color={(hoverRating || ratingValue) >= star ? '#DAA520' : '#e4e5e9'} onClick={() => setRatingValue(star)} onMouseEnter={() => setHoverRating(star)} onMouseLeave={() => setHoverRating(0)} style={{ cursor: 'pointer' }} />)}
             </div>
             <p className="mt-3 text-muted">{ratingValue > 0 ? `You selected ${ratingValue} star${ratingValue > 1 ? 's' : ''}` : 'Click on a star to rate'}</p>
           </div>
         </Modal.Body>
-        <Modal.Footer><Button variant="secondary" onClick={() => setShowRatingModal(false)}>Cancel</Button><Button variant="primary" onClick={handleAddRating} disabled={ratingValue === 0}>Submit Rating</Button></Modal.Footer>
+        <Modal.Footer><Button variant="secondary" onClick={() => setShowRatingModal(false)}>Cancel</Button><Button onClick={handleAddRating} disabled={ratingValue === 0} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>Submit Rating</Button></Modal.Footer>
       </Modal>
+      
+      {/* Add/Edit Post Modal */}
       <Modal show={showPostModal} onHide={() => { setShowPostModal(false); setEditingPost(null); setFormData({}); setSelectedFile(null); setPreviewUrl(null); }} size="lg">
-        <Modal.Header closeButton><Modal.Title>{editingPost ? 'Edit Post' : 'Add New Post'}</Modal.Title></Modal.Header>
+        <Modal.Header closeButton><Modal.Title style={{ color: '#DAA520' }}>{editingPost ? '‚úèÔ∏è Edit Post' : 'Ì≥∑ Add New Post'}</Modal.Title></Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmitPost}>
             <Form.Group className="mb-3"><Form.Label>Title</Form.Label><Form.Control value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required /></Form.Group>
-            <Form.Group className="mb-3"><Form.Label>Upload Image or Video (Up to 100MB)</Form.Label><div className="border rounded p-3 text-center"><Form.Control type="file" accept="image/*,video/*" onChange={handleFileSelect} disabled={uploading} className="mb-2" />{uploading && <div className="text-center"><Spinner animation="border" size="sm" className="me-2" /><span>Uploading... Please wait</span></div>}{(previewUrl || formData.imageUrl) && (<div className="mt-2">{previewUrl && (previewUrl.match(/\.(mp4|mov|avi|webm|mkv)$/i) || formData.imageUrl?.match(/\.(mp4|mov|avi|webm|mkv)$/i) ? <video src={previewUrl || formData.imageUrl} style={{ maxHeight: '150px' }} controls /> : <img src={previewUrl || formData.imageUrl} alt="Preview" style={{ maxHeight: '150px' }} />)}<Button size="sm" variant="link" onClick={() => { setSelectedFile(null); setPreviewUrl(null); setFormData({...formData, imageUrl: ''}); }}>Remove</Button></div>)}<small className="text-muted text-center d-block mt-2">Upload images (JPG, PNG, GIF) up to 10MB<br />Upload videos (MP4, MOV, AVI, WEBM) up to 100MB</small></div></Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label><FaUpload className="me-1" /> Upload Image or Video (Up to 100MB)</Form.Label>
+              <div className="border rounded p-3 text-center" style={{ borderColor: '#DAA520' }}>
+                <Form.Control type="file" accept="image/*,video/*" onChange={handleFileSelect} disabled={uploading} className="mb-2" />
+                {uploading && <div className="text-center"><Spinner animation="border" size="sm" className="me-2" /><span>Uploading... Please wait</span></div>}
+                {(previewUrl || formData.imageUrl) && (<div className="mt-2">{previewUrl && (previewUrl.match(/\.(mp4|mov|avi|webm|mkv)$/i) || formData.imageUrl?.match(/\.(mp4|mov|avi|webm|mkv)$/i) ? <video src={previewUrl || formData.imageUrl} style={{ maxHeight: '150px' }} controls /> : <img src={previewUrl || formData.imageUrl} alt="Preview" style={{ maxHeight: '150px' }} />)}<Button size="sm" variant="link" onClick={() => { setSelectedFile(null); setPreviewUrl(null); setFormData({...formData, imageUrl: ''}); }}>Remove</Button></div>)}
+                <small className="text-muted text-center d-block mt-2">Upload images (JPG, PNG, GIF) up to 10MB<br />Upload videos (MP4, MOV, AVI, WEBM) up to 100MB</small>
+              </div>
+            </Form.Group>
             <Form.Group className="mb-3"><Form.Label>Description</Form.Label><Form.Control as="textarea" rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} /></Form.Group>
-            <Button type="submit" disabled={uploading}>{uploading ? 'Uploading...' : (editingPost ? 'Update' : 'Create Post')}</Button>
+            <Button type="submit" disabled={uploading} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>{uploading ? 'Uploading...' : (editingPost ? 'Update' : 'Create Post')}</Button>
           </Form>
         </Modal.Body>
       </Modal>
+      
+      {/* Comments Modal */}
       <Modal show={showCommentModal} onHide={() => { setShowCommentModal(false); setCommentText(''); }} size="lg">
-        <Modal.Header closeButton><Modal.Title>Comments for {selectedPost?.title}</Modal.Title></Modal.Header>
+        <Modal.Header closeButton><Modal.Title style={{ color: '#DAA520' }}>Ì≤¨ Comments for {selectedPost?.title}</Modal.Title></Modal.Header>
         <Modal.Body>
           {selectedPost?.comments?.length === 0 && <p className="text-muted">No comments yet. Be the first to comment!</p>}
           {selectedPost?.comments?.map(comment => (<div key={comment._id} className="mb-3 p-2 bg-light rounded"><div className="d-flex justify-content-between"><strong>{comment.userId?.name || 'User'}</strong>{(isAdmin || comment.userId?._id === user?._id) && <Button size="sm" variant="link" className="text-danger p-0" onClick={() => deleteComment(selectedPost._id, comment._id)}><FaTrash /></Button>}</div><p className="mb-0 mt-1">{comment.text}</p><small className="text-muted">{new Date(comment.createdAt).toLocaleDateString()}</small></div>))}
-          {user && (<div className="mt-3"><Form.Group className="mb-3"><Form.Label>Add a comment</Form.Label><Form.Control as="textarea" rows={2} value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write your comment here..." /></Form.Group><Button variant="primary" onClick={handleAddComment}>Post Comment</Button></div>)}
+          {user && (<div className="mt-3"><Form.Group className="mb-3"><Form.Label>Add a comment</Form.Label><Form.Control as="textarea" rows={2} value={commentText} onChange={e => setCommentText(e.target.value)} placeholder="Write your comment here..." /></Form.Group><Button onClick={handleAddComment} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>Post Comment</Button></div>)}
           {!user && <p className="text-muted mt-3">Please <a href="/login">login</a> to leave a comment.</p>}
         </Modal.Body>
       </Modal>

@@ -3,16 +3,15 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import Layout from './components/Layout/Layout';
 import ProtectedRoute from './components/Common/ProtectedRoute';
-// Customer Pages
 import Home from './pages/Home';
 import Services from './pages/Services';
-import BookNow from './pages/BookNow';
+import StaffPage from './pages/StaffPage';
 import GalleryPage from './pages/GalleryPage';
-import MyBookings from './pages/MyBookings';
-// Auth Pages
+import LocationPage from './pages/LocationPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-// Admin Pages
+import BookNow from './pages/BookNow';
+import MyBookings from './pages/MyBookings';
 import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
@@ -22,22 +21,20 @@ function App() {
         <Layout>
           <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
           <Routes>
-            {/* Public Routes - Everyone can see */}
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/staff" element={<StaffPage />} />
             <Route path="/gallery" element={<GalleryPage />} />
-            
-            {/* Customer Booking Flow - No login required */}
-            <Route path="/book-now" element={<BookNow />} />
-            
-            {/* Customer Routes - Require login to view bookings */}
-            <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
-            
-            {/* Auth Routes */}
+            <Route path="/location" element={<LocationPage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/book-now" element={<BookNow />} />
             
-            {/* Admin Routes - Require admin role */}
+            {/* Protected Routes (require login) */}
+            <Route path="/my-bookings" element={<ProtectedRoute><MyBookings /></ProtectedRoute>} />
+            
+            {/* Admin Only Route */}
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
           </Routes>
         </Layout>

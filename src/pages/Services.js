@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { serviceAPI } from '../services/api';
 import { Container, Row, Col, Card, Spinner, Badge, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { FaClock, FaStar } from 'react-icons/fa';
+import { FaClock, FaStar, FaCut, FaPaintBrush, FaSpa, FaHandSparkles, FaMagic } from 'react-icons/fa';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -42,6 +42,26 @@ const Services = () => {
     navigate('/book-now');
   };
 
+  const getCategoryIcon = (category) => {
+    switch(category) {
+      case 'hair': return <FaCut className="me-2" />;
+      case 'nails': return <FaHandSparkles className="me-2" />;
+      case 'makeup': return <FaMagic className="me-2" />;
+      case 'spa': return <FaSpa className="me-2" />;
+      default: return <FaCut className="me-2" />;
+    }
+  };
+
+  const getCategoryTitle = (category) => {
+    switch(category) {
+      case 'hair': return 'Hair Services';
+      case 'nails': return 'Nail Services';
+      case 'makeup': return 'Makeup Services';
+      case 'spa': return 'Spa & Facial';
+      default: return 'Services';
+    }
+  };
+
   // Group services by category
   const hairServices = services.filter(s => s.category === 'hair');
   const nailServices = services.filter(s => s.category === 'nails');
@@ -53,14 +73,16 @@ const Services = () => {
   return (
     <Container className="py-4">
       <div className="text-center mb-5">
-        <h1 className="display-4 fw-bold mb-3">Our Services</h1>
+        <h1 className="display-4 fw-bold mb-3" style={{ color: '#DAA520' }}>Our Services</h1>
         <p className="lead text-muted">Discover our wide range of professional beauty services</p>
       </div>
 
       {/* Hair Services */}
       {hairServices.length > 0 && (
         <div className="mb-5">
-          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block' }}>Ì≤á‚Äç‚ôÄÔ∏è Hair Services</h2>
+          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block', color: '#DAA520' }}>
+            {getCategoryIcon('hair')} {getCategoryTitle('hair')}
+          </h2>
           <Row>
             {hairServices.map(service => (
               <Col md={4} key={service._id} className="mb-4">
@@ -86,7 +108,7 @@ const Services = () => {
                     </div>
                   </Card.Body>
                   <Card.Footer className="bg-white border-0 pb-3">
-                    <Button variant="primary" className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
+                    <Button className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
                       Book Now
                     </Button>
                   </Card.Footer>
@@ -100,7 +122,9 @@ const Services = () => {
       {/* Nail Services */}
       {nailServices.length > 0 && (
         <div className="mb-5">
-          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block' }}>Ì≤Ö Nail Services</h2>
+          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block', color: '#DAA520' }}>
+            {getCategoryIcon('nails')} {getCategoryTitle('nails')}
+          </h2>
           <Row>
             {nailServices.map(service => (
               <Col md={4} key={service._id} className="mb-4">
@@ -123,7 +147,7 @@ const Services = () => {
                     </div>
                   </Card.Body>
                   <Card.Footer className="bg-white border-0 pb-3">
-                    <Button variant="primary" className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
+                    <Button className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
                       Book Now
                     </Button>
                   </Card.Footer>
@@ -137,7 +161,9 @@ const Services = () => {
       {/* Makeup Services */}
       {makeupServices.length > 0 && (
         <div className="mb-5">
-          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block' }}>Ì≤Ñ Makeup Services</h2>
+          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block', color: '#DAA520' }}>
+            {getCategoryIcon('makeup')} {getCategoryTitle('makeup')}
+          </h2>
           <Row>
             {makeupServices.map(service => (
               <Col md={4} key={service._id} className="mb-4">
@@ -160,7 +186,7 @@ const Services = () => {
                     </div>
                   </Card.Body>
                   <Card.Footer className="bg-white border-0 pb-3">
-                    <Button variant="primary" className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
+                    <Button className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
                       Book Now
                     </Button>
                   </Card.Footer>
@@ -174,7 +200,9 @@ const Services = () => {
       {/* Spa & Facial Services */}
       {spaServices.length > 0 && (
         <div className="mb-5">
-          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block' }}>Ì∑ñ‚Äç‚ôÄÔ∏è Spa & Facial</h2>
+          <h2 className="mb-4 pb-2" style={{ borderBottom: '3px solid #DAA520', display: 'inline-block', color: '#DAA520' }}>
+            {getCategoryIcon('spa')} {getCategoryTitle('spa')}
+          </h2>
           <Row>
             {spaServices.map(service => (
               <Col md={4} key={service._id} className="mb-4">
@@ -197,7 +225,7 @@ const Services = () => {
                     </div>
                   </Card.Body>
                   <Card.Footer className="bg-white border-0 pb-3">
-                    <Button variant="primary" className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
+                    <Button className="w-100 py-2" onClick={() => handleBookNow(service)} style={{ backgroundColor: '#DAA520', borderColor: '#DAA520' }}>
                       Book Now
                     </Button>
                   </Card.Footer>
